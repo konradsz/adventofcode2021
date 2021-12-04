@@ -32,7 +32,7 @@ fn part_2(numbers: Vec<u32>) -> u32 {
     let mut oxygen_numbers = numbers.clone();
     let mut co2_numbers = numbers;
 
-    let is_more_1_bits_on_position = |numbers: &Vec<u32>, position: u32| {
+    let is_more_1_bits_on_position = |numbers: &[u32], position: u32| {
         let (zeros, ones) = numbers.iter().fold((0, 0), |(zeros, ones), number| {
             if (*number & 1 << position) > 0 {
                 (zeros, ones + 1)
