@@ -21,39 +21,44 @@ fn count_overlapping_points<'a>(input_iterator: impl Iterator<Item = &'a Coordin
     for coords in input_iterator {
         let ((x1, y1), (x2, y2)) = *coords;
 
-        if x1 == x2 {
+        let (mut r1, mut r2, mut r3, mut r4, mut r5, mut r6, mut r7, mut r8);
+        let range: &mut dyn Iterator<Item = (u32, u32)> = if x1 == x2 {
             if y1 < y2 {
-                (y1..=y2).for_each(|y| *diagram.entry((x1, y)).or_default() += 1);
+                r1 = (y1..=y2).map(|y| (x1, y));
+                &mut r1
             } else {
-                (y2..=y1).for_each(|y| *diagram.entry((x1, y)).or_default() += 1);
+                r2 = (y2..=y1).map(|y| (x1, y));
+                &mut r2
             }
         } else if y1 == y2 {
             if x1 < x2 {
-                (x1..=x2).for_each(|x| *diagram.entry((x, y1)).or_default() += 1);
+                r3 = (x1..=x2).map(|x| (x, y1));
+                &mut r3
             } else {
-                (x2..=x1).for_each(|x| *diagram.entry((x, y1)).or_default() += 1);
+                r4 = (x2..=x1).map(|x| (x, y1));
+                &mut r4
             }
         } else if x1 < x2 {
             if y1 < y2 {
-                (x1..=x2)
-                    .zip(y1..=y2)
-                    .for_each(|(x, y)| *diagram.entry((x, y)).or_default() += 1);
+                r5 = (x1..=x2).zip(y1..=y2);
+                &mut r5
             } else {
-                (x1..=x2)
-                    .zip((y2..=y1).rev())
-                    .for_each(|(x, y)| *diagram.entry((x, y)).or_default() += 1);
+                r6 = (x1..=x2).zip((y2..=y1).rev());
+                &mut r6
             }
         } else if x1 > x2 {
             if y1 < y2 {
-                (x2..=x1)
-                    .zip((y1..=y2).rev())
-                    .for_each(|(x, y)| *diagram.entry((x, y)).or_default() += 1);
+                r7 = (x2..=x1).zip((y1..=y2).rev());
+                &mut r7
             } else {
-                (x2..=x1)
-                    .zip(y2..=y1)
-                    .for_each(|(x, y)| *diagram.entry((x, y)).or_default() += 1);
+                r8 = (x2..=x1).zip(y2..=y1);
+                &mut r8
             }
-        }
+        } else {
+            unreachable!()
+        };
+
+        range.for_each(|(x, y)| *diagram.entry((x, y)).or_default() += 1);
     }
 
     diagram.values().filter(|&&value| value > 1).count()
@@ -71,19 +76,19 @@ fn parse_input() -> Result<Vec<Coordinates>> {
             let mut parts = line.split(" -> ");
             let mut coords = parts
                 .next()
-                .ok_or(anyhow!("invalid input"))?
+                .ok_or(anyhow!("missing start"))?
                 .split(',')
-                .chain(parts.next().ok_or(anyhow!("invalid input"))?.split(','))
+                .chain(parts.next().ok_or(anyhow!("missing end"))?.split(','))
                 .map(|n| -> Result<u32> { Ok(n.parse::<u32>()?) });
 
             Ok((
                 (
-                    coords.next().ok_or(anyhow!("invalid input"))??,
-                    coords.next().ok_or(anyhow!("invalid input"))??,
+                    coords.next().ok_or(anyhow!("no x1"))??,
+                    coords.next().ok_or(anyhow!("no y1"))??,
                 ),
                 (
-                    coords.next().ok_or(anyhow!("invalid input"))??,
-                    coords.next().ok_or(anyhow!("invalid input"))??,
+                    coords.next().ok_or(anyhow!("no x2"))??,
+                    coords.next().ok_or(anyhow!("no y2"))??,
                 ),
             ))
         })
