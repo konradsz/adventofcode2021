@@ -1,3 +1,36 @@
+// Efficient implementation
+#[derive(Default)]
+struct Fishes {
+    lifecycle: [usize; 7],
+    incubator: [usize; 2],
+}
+
+fn calculate_fishes(initial: &[u32], days: usize) -> usize {
+    let mut fishes = Fishes::default();
+    initial
+        .iter()
+        .for_each(|&fish| fishes.lifecycle[fish as usize] += 1);
+
+    (0..days).for_each(|_| {
+        let new_fishes = fishes.lifecycle[0];
+        fishes.lifecycle.rotate_left(1);
+        fishes.lifecycle[6] = fishes.incubator[0] + new_fishes;
+        fishes.incubator[0] = fishes.incubator[1];
+        fishes.incubator[1] = new_fishes;
+    });
+
+    fishes.lifecycle.iter().sum::<usize>() + fishes.incubator.iter().sum::<usize>()
+}
+
+fn part_1_efficient(initial: &[u32]) -> usize {
+    calculate_fishes(initial, 80)
+}
+
+fn part_2_efficient(initial: &[u32]) -> usize {
+    calculate_fishes(initial, 256)
+}
+
+// Initial naive implementation, takes about 1-2 minutes to finish (depending on CPU)
 use std::collections::HashMap;
 
 const CYCLE_LENGTH: usize = 7;
@@ -49,11 +82,11 @@ fn populate_groups(fish_groups: &HashMap<u32, usize>, end: u32) -> usize {
         .sum()
 }
 
-fn part_1(fish_groups: &HashMap<u32, usize>) -> usize {
+fn part_1_naive(fish_groups: &HashMap<u32, usize>) -> usize {
     populate_groups(fish_groups, 80)
 }
 
-fn part_2(fish_groups: &HashMap<u32, usize>) -> usize {
+fn part_2_naive(fish_groups: &HashMap<u32, usize>) -> usize {
     populate_groups(fish_groups, 256)
 }
 
@@ -76,6 +109,9 @@ fn main() {
         *groups.entry(fish).or_default() += 1;
     }
 
-    assert_eq!(part_1(&groups), 383160);
-    assert_eq!(part_2(&groups), 1721148811504);
+    assert_eq!(part_1_efficient(&initial), 383160);
+    assert_eq!(part_2_efficient(&initial), 1721148811504);
+
+    assert_eq!(part_1_naive(&groups), 383160);
+    assert_eq!(part_2_naive(&groups), 1721148811504);
 }
