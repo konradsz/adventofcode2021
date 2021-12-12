@@ -60,7 +60,7 @@ impl Fish {
         ((self.birthday + self.counter)..)
             .step_by(CYCLE_LENGTH)
             .take_while(move |day| *day <= end)
-            .map(|birthday| Fish::born(birthday))
+            .map(Fish::born)
     }
 }
 

@@ -7,12 +7,12 @@ use std::{
 
 type Coordinates = ((u32, u32), (u32, u32));
 
-fn part_1(input: &Vec<Coordinates>) -> usize {
+fn part_1(input: &[Coordinates]) -> usize {
     let is_vertical_or_horizontal = |((x1, y1), (x2, y2)): &&Coordinates| x1 == x2 || y1 == y2;
     count_overlapping_points(input.iter().filter(is_vertical_or_horizontal))
 }
 
-fn part_2(input: &Vec<Coordinates>) -> usize {
+fn part_2(input: &[Coordinates]) -> usize {
     count_overlapping_points(input.iter())
 }
 
@@ -68,7 +68,7 @@ fn parse_input() -> Result<Vec<Coordinates>> {
     let file = File::open("input")?;
     let reader = BufReader::new(file);
 
-    Ok(reader
+    reader
         .lines()
         .map(|line| -> Result<Coordinates> {
             let line = line?;
@@ -92,7 +92,7 @@ fn parse_input() -> Result<Vec<Coordinates>> {
                 ),
             ))
         })
-        .collect::<Result<Vec<_>>>()?)
+        .collect::<Result<Vec<_>>>()
 }
 
 fn main() -> Result<()> {

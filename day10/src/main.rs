@@ -107,7 +107,7 @@ fn part_2(input: &str) -> usize {
         })
         .collect::<Vec<_>>();
 
-    results.sort();
+    results.sort_unstable();
     results[results.len() / 2]
 }
 

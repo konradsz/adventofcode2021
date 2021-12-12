@@ -7,12 +7,9 @@ struct Pattern<'a>(&'a str);
 
 impl<'a> Pattern<'a> {
     fn contains(&self, letters: &[char]) -> bool {
-        letters.iter().all(|c| {
-            self.0
-                .chars()
-                .find(|pattern_char| pattern_char == c)
-                .is_some()
-        })
+        letters
+            .iter()
+            .all(|c| self.0.chars().any(|pattern_char| pattern_char == *c))
     }
 }
 
@@ -22,7 +19,7 @@ impl<'a> Sub<&Pattern<'a>> for &Pattern<'a> {
     fn sub(self, rhs: &Pattern<'a>) -> Self::Output {
         self.0
             .chars()
-            .filter(|lhs_c| rhs.0.chars().find(|rhs_c| rhs_c == lhs_c).is_none())
+            .filter(|lhs_c| rhs.0.chars().all(|rhs_c| rhs_c != *lhs_c))
             .collect()
     }
 }
@@ -32,7 +29,7 @@ impl<'a> Sub<&Pattern<'a>> for Vec<char> {
 
     fn sub(self, rhs: &Pattern<'a>) -> Self::Output {
         self.into_iter()
-            .filter(|&item| !rhs.0.chars().find(|&c| item == c).is_some())
+            .filter(|&item| !rhs.0.chars().any(|c| item == c))
             .collect()
     }
 }
@@ -65,9 +62,9 @@ fn part_1(entries: &[Entry]) -> usize {
         .sum()
 }
 
-fn part_2(entries: &Vec<Entry>) -> usize {
+fn part_2(entries: &[Entry]) -> usize {
     entries
-        .into_iter()
+        .iter()
         .map(|(patterns, digits)| {
             let mut v5 = Vec::new();
             let mut v6 = Vec::new();
