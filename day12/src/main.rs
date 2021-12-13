@@ -15,18 +15,16 @@ fn look_for_path(
     mut connections: HashMap<String, Vec<String>>,
     mut visited_small_caves: Vec<String>,
     mut visited_twice: bool,
-    possible_paths: &mut Vec<Vec<String>>,
-) {
+) -> usize {
     let current_cave = current_path.last().unwrap();
     if current_cave == "end" {
-        possible_paths.push(current_path);
-        return;
+        return 1;
     }
 
     let destinations = if let Some(destinations) = connections.get(current_cave) {
         destinations.clone()
     } else {
-        return;
+        return 0;
     };
 
     if is_small_cave(current_cave) {
@@ -46,42 +44,28 @@ fn look_for_path(
         }
     }
 
+    let mut possible_path_count = 0;
+
     for destination in destinations {
         let mut my_path = current_path.clone();
         my_path.push(destination.clone());
-        look_for_path(
+        possible_path_count += look_for_path(
             my_path.clone(),
             connections.clone(),
             visited_small_caves.clone(),
             visited_twice,
-            possible_paths,
         );
     }
+
+    possible_path_count
 }
 
 fn part_1(connections: HashMap<String, Vec<String>>) -> usize {
-    let mut possible_paths = Vec::new();
-    look_for_path(
-        vec!["start".into()],
-        connections,
-        Vec::new(),
-        true,
-        &mut possible_paths,
-    );
-    possible_paths.len()
+    look_for_path(vec!["start".into()], connections, Vec::new(), true)
 }
 
 fn part_2(connections: HashMap<String, Vec<String>>) -> usize {
-    let mut possible_paths = Vec::new();
-    look_for_path(
-        vec!["start".into()],
-        connections,
-        Vec::new(),
-        false,
-        &mut possible_paths,
-    );
-
-    possible_paths.len()
+    look_for_path(vec!["start".into()], connections, Vec::new(), false)
 }
 
 fn main() {
